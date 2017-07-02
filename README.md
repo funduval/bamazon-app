@@ -11,7 +11,8 @@
 #### I intend to keep building on it) from anywhere. So, if you get thrown off, or if it's not creating the
 #### table from the get-go (I worry the table itself has a bug,) here's my connection info:
 
-```var connection = mysql.createConnection({
+```
+var connection = mysql.createConnection({
 host: "olxl65dqfuqr6s4y.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
 port: 3306,
 user: "otctzaj5ktg8bdja",
