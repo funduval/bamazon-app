@@ -38,9 +38,9 @@ connection.connect(function(err) {
 });  
 } 
 
-makeTable();
+setTimeout(makeTable, 2000, rows)
 
-setTimeout(newOrder, 2000);
+setTimeout(newOrder, 3000);
 
 function newOrder() {
 
@@ -238,7 +238,7 @@ function reset() {
 }
 
 // // from tty-table documentation:
-function makeTable() {
+function makeTable(rows) {
 
     var query = "SELECT id, product_name, price, department_name FROM products";
 
@@ -248,6 +248,7 @@ function makeTable() {
             for (var i = 0; i < res.length; i++) {
                 rows.push(res[i])
             }
+          
 
         var header = [{
             value: "id",
