@@ -7,6 +7,7 @@ const chalk = require('chalk');
 let data = [];
 let item = 0;
 let productName = "";
+let price = 0;
 let quantity = 0;
 let department = "";
 let newQuant = 0;
@@ -23,11 +24,24 @@ var connection = mysql.createConnection({
     database: "r8hnulrvy9z046ju"
 });
 
-//call the new order function. Needs a new instance constructor for each new order.
+// //call the new order function. Needs a new instance constructor for each new order.
 
+start();
+
+function start(){
+
+connection.connect(function(err) {
+
+    if (err) throw err;
+  console.log("Connected!");
+
+});
 
 makeTable();
-setTimeout(newOrder, 4000);
+
+setTimeout(newOrder, 6000);
+
+}
 
 
 function newOrder() {
@@ -57,6 +71,7 @@ function searchItem(item, rows) {
 
     var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products WHERE ?";
 
+ console.log(price)
     connection.query(query, { id: item }, function(err, res) {
 
         for (key in res) {
@@ -117,15 +132,15 @@ function ifOrder(item, productName, price, department, quantity, amount) {
             message: "Would you like to order the " + productName + "?"
         })
         .then(function(answer) {
-            console.log(answer.order_confirmation)
+           
 
             if (answer.order_confirmation === false) {
 
                 console.log("No? Perhaps you'd like to order something else.")
 
                 setTimeout(reset, 1000);
-
-                setTimeout(newOrder, 2000);
+                setTimeout(makeTable, 2000);
+                setTimeout(newOrder, 3000);
 
             }
             if (answer.order_confirmation === true) {
@@ -171,8 +186,9 @@ function checkInventory(item, productName, price, department, quantity, amount) 
         rows = smallArray;
         console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
         setTimeout(smallDataTable, 1500)
-        setTimeout(reset, 2800, rows);
-        setTimeout(newOrder, 6000);
+                setTimeout(reset, 2000);
+                setTimeout(makeTable, 2500);
+                setTimeout(newOrder, 3000);
 
     } else {
         rows = smallArray;
@@ -188,8 +204,9 @@ function calculateCost(item, productName, price, department, quantity, amount) {
     console.log("Your order comes to $" + price * amount);
 
     upDate(item, productName, price, department, quantity, newQuant, amount);
-    setTimeout(reset, 2800);
-    setTimeout(newOrder, 7000);
+                setTimeout(reset, 2000);
+                setTimeout(makeTable, 2500);
+                setTimeout(newOrder, 3000);
 }
 
 function upDate(item, productName, price, department, quantity, newQuant, amount) {
@@ -218,16 +235,12 @@ function reset() {
     let newQuant = 0;
     var tableArray = [];
     var smallArray = [];
-    var rows = [];
-    makeTable();
 
 }
 
-// from tty-table documentation:
+// // from tty-table documentation:
 
 function makeTable() {
-
-    connection.connect(function(err) {
 
     var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products";
 
@@ -237,8 +250,9 @@ function makeTable() {
             tableArray.push(res[i])
         }
 
-        rows = tableArray;
-        console.log(rows);
+        var rows = tableArray;
+        // console.log(rows)
+
 
 
         var header = [{
@@ -286,6 +300,8 @@ function makeTable() {
             }())
         ];
 
+
+
         var t2 = Table(header, rows, {
             borderStyle: 1,
             paddingBottom: 0,
@@ -294,13 +310,16 @@ function makeTable() {
             color: "white"
         });
 
+ 
+
         var str2 = t2.render(rows);
         console.log(str2);
 
-    });
+        });
 
-});
-    console.log("Attention shoppers! Select from these items by item id:")
+
+
+    console.log("Attention shoppers! Select from these items by item id:");
 };
 
 function smallTable(rows) {
