@@ -5,12 +5,17 @@ const chalk = require('chalk');
 
 //make all the variables global to use in any function
 
-let data;
-let item;
-let productName;
-let quantity;
-let department;
-let newQuant;
+let data=[];
+let item=0;
+let productName="";
+let quantity=0;
+let department="";
+let newQuant=0;
+var tableArray=[];
+var smallArray=[];
+
+
+
 
 //creating connection to Jaws MariaDB
 
@@ -23,6 +28,7 @@ var connection = mysql.createConnection({
 });
 
 //call the new order function. I should make a new instance constructor for each order
+makeTable();
 
 newOrder();
 
@@ -49,8 +55,8 @@ function newOrder() {
         });
 }
 
-function searchItem(item) {
-
+function searchItem(item,rows) {
+   
     var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products WHERE ?";
 
     connection.query(query, { id: item }, function(err, res) {
@@ -58,18 +64,21 @@ function searchItem(item) {
         for (key in res) {
 
             data = res[key]
+            smallArray.push(data)
 
         }
 
         console.log("\nYou searched for: " + data.product_name + "\nPrice: " + data.price);
 
         //parse all the values to store in global variables
-        item = data.id
-        productName = data.product_name
-        price = data.price
-        department = data.department_name
-        quantity = data.stock_quantity
-        nextQuestion(item, productName, price, department, quantity)
+        item = data.id;
+        productName = data.product_name;
+        price = data.price;
+        department = data.department_name;
+        quantity = data.stock_quantity;
+        rows = smallArray;
+        smallTable(rows);
+        nextQuestion(item, productName, price, department, quantity);
 
     });
 }
@@ -97,9 +106,7 @@ function nextQuestion(item, productName, price, department, quantity) {
 
 function checkQuantity(item, productName, price, department, quantity, amount) {
 
-    var query = "SELECT stock_quantity, product_name FROM products WHERE ?";
-
-    console.log("I checked, we have " + quantity + " left of " + productName);
+    console.log("We have " + quantity + " left of " + productName);
 
     ifOrder(item, productName, price, department, quantity, amount);
 }
@@ -113,8 +120,19 @@ function ifOrder(item, productName, price, department, quantity, amount) {
         })
         .then(function(answer) {
 
-            console.log(answer);
-            takeOrder(item, productName, price, department, quantity, amount);
+            if('order confirmation' === false){
+
+               console.log("No? Perhaps you'd like to order something else.")
+               setTimeout(reset, 1000);
+               setTimeout(makeTable, 1800);
+               setTimeout(newOrder, 2000);
+            
+          }
+            else{
+
+               takeOrder(item, productName, price, department, quantity, amount);
+
+            }
         });
 }
 
@@ -139,27 +157,25 @@ function takeOrder(item, productName, price, department, quantity, amount) {
 
     function checkInventory(item, productName, price, department, quantity, amount) {
 
-        console.log("Checking inventory.");
-
         newQuant = quantity - amount
 
         if (newQuant < 5) {
 
-            console.log("Good timing! There are only 5 orders left.")
-            upDate(item, productName, price, department, quantity, newQuant, amount);
-            calculateCost(item, productName, price, department, quantity, amount);
+            console.log("Good timing! There are fewer than 5 orders left.")
+            setTimeout(calculateCost,2800,item, productName, price, department, quantity, amount);
 
 
         } else if (newQuant === 0) {
 
             console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
-
-            newOrder();
+            setTimeout(reset, 2800);
+            setTimeout(makeTable, 3800);
+            setTimeout(newOrder, 4000);
 
         } else {
-
-            upDate(item, productName, price, department, quantity, newQuant, amount);
-            calculateCost(item, productName, price, department, quantity, amount);
+          console.log("Alrighty, we've plenty of those!")
+         setTimeout(calculateCost,2800,item, productName, price, department, quantity, amount);
+          
         }
       }
 
@@ -167,23 +183,198 @@ function takeOrder(item, productName, price, department, quantity, amount) {
 
         console.log("Your order comes to $" + price * amount);
 
-        upDate(item, productName, price, department, quantity, amount);
+        upDate(item, productName, price, department, quantity, newQuant, amount);
+        setTimeout(reset, 2800);
+        setTimeout(makeTable, 3800);
+        setTimeout(newOrder, 4000);
 
     }
 
     function upDate(item, productName, price, department, quantity, newQuant, amount) {
-
+      console.log("updating databases")
       connection.connect(function(err) {
 
-            newQuant = newQuant
-            item = item
+            var lessQuant = quantity-amount
+            var id = item
 
-            var sql = "UPDATE products SET stock_quantity =" + newQuant.toString() + " WHERE ?";
+            var sql = "UPDATE products SET stock_quantity =" + lessQuant.toString() + " WHERE ?";
 
-            connection.query(sql, { id: item }, function(err, result) {
+            connection.query(sql, { id: id }, function(err, result) {
                 if (err) throw err;
                 console.log(result.affectedRows + " record(s) updated");
+
             });   
     });
-                  newOrder();
+       
   }
+
+  function makeTable(){
+console.log("Attention shoppers! Select from these items by item id:")
+
+var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products";
+
+connection.query(query, function(err, res) {
+
+   for (var i = 0; i < res.length; i++) {
+     tableArray.push(res[i])
+   }
+
+rows = tableArray;
+
+var header = [
+  {
+    value : "id",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 8
+  },
+  {
+    value : "product_name",
+    headerColor : "yellow",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "price",
+    headerColor : "magenta",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 28
+  },
+  {
+    value : "department_name",
+    headerColor : "green",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "stock_quantity",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 37
+  }]
+
+var footer = [
+  "TOTAL",
+  (function(){
+    return rows.reduce(function(prev,curr){
+      return prev+curr[1]
+    },0)
+  }()),
+  (function(){
+    var total = rows.reduce(function(prev,curr){
+      return prev+((curr[2]==='yes') ? 1 : 0);
+    },0);
+    return (total/rows.length*100).toFixed(2) + "%";
+  }())];
+
+var t2 = Table(header,rows,{
+  borderStyle : 1,
+  paddingBottom : 0,
+  headerAlign : "center",
+  align : "center",
+  color : "white"
+});
+
+var str2 = t2.render();
+console.log(str2);
+
+ });
+ };
+
+
+function smallTable(rows){
+
+var header = [
+  {
+    value : "id",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 8
+  },
+  {
+    value : "product_name",
+    headerColor : "yellow",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "price",
+    headerColor : "magenta",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 28
+  },
+  {
+    value : "department_name",
+    headerColor : "green",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "stock_quantity",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 37
+  }]
+
+var footer = [
+  "TOTAL",
+  (function(){
+    return rows.reduce(function(prev,curr){
+      return prev+curr[1]
+    },0)
+  }()),
+  (function(){
+    var total = rows.reduce(function(prev,curr){
+      return prev+((curr[2]==='yes') ? 1 : 0);
+    },0);
+    return (total/rows.length*100).toFixed(2) + "%";
+  }())];
+
+var t2 = Table(header,rows,{
+  borderStyle : 1,
+  paddingBottom : 0,
+  headerAlign : "center",
+  align : "center",
+  color : "white"
+});
+
+var str2 = t2.render();
+console.log(str2);
+
+ };
+
+ function reset() {
+
+let data=[];
+let item=0;
+let productName="";
+let quantity=0;
+let department="";
+let newQuant=0;
+var tableArray=[];
+var smallArray=[];
+
+ }
+
+
+
