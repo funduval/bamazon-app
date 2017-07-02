@@ -11,8 +11,8 @@ let price = 0;
 let quantity = 0;
 let department = "";
 let newQuant = 0;
-var tableArray = [];
 var smallArray = [];
+var smallDataArray = [];
 var rows = [];
 
 //creating connection to Jaws MariaDB
@@ -33,16 +33,14 @@ function start(){
 connection.connect(function(err) {
 
     if (err) throw err;
-  console.log("Connected!");
+  console.log("Connected!")
 
-});
+});  
+} 
 
 makeTable();
 
-setTimeout(newOrder, 6000);
-
-}
-
+setTimeout(newOrder, 2000);
 
 function newOrder() {
 
@@ -67,7 +65,7 @@ function newOrder() {
         });
 }
 
-function searchItem(item, rows) {
+function searchItem(item) {
 
     var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products WHERE ?";
 
@@ -76,8 +74,10 @@ function searchItem(item, rows) {
 
         for (key in res) {
 
-            data = res[key]
-            smallArray.push(data)
+            data = res[key];
+            smallArray.push(data);
+            smallDataArray.push(data);
+       
 
         }
 
@@ -132,7 +132,6 @@ function ifOrder(item, productName, price, department, quantity, amount) {
             message: "Would you like to order the " + productName + "?"
         })
         .then(function(answer) {
-           
 
             if (answer.order_confirmation === false) {
 
@@ -177,21 +176,21 @@ function checkInventory(item, productName, price, department, quantity, amount) 
     newQuant = quantity - amount
 
     if (newQuant < 5) {
-        rows = smallArray;
+        rows = smallDataArray;
         console.log("Good timing! There are fewer than 5 orders left.")
         setTimeout(smallDataTable, 1500, rows)
         setTimeout(calculateCost, 2800, item, productName, price, department, quantity, amount);
 
     } else if (newQuant === 0) {
-        rows = smallArray;
+        rows = smallDataArray;
         console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
-        setTimeout(smallDataTable, 1500)
+        setTimeout(smallDataTable, 1500,rows)
                 setTimeout(reset, 2000);
                 setTimeout(makeTable, 2500);
                 setTimeout(newOrder, 3000);
 
     } else {
-        rows = smallArray;
+        rows = smallDataArray;
         console.log("Alrighty, we've plenty of those!")
         setTimeout(smallDataTable, 1500, rows)
         setTimeout(calculateCost, 2800, item, productName, price, department, quantity, amount);
@@ -233,27 +232,22 @@ function reset() {
     let quantity = 0;
     let department = "";
     let newQuant = 0;
-    var tableArray = [];
     var smallArray = [];
+    var rows = [];
 
 }
 
 // // from tty-table documentation:
-
 function makeTable() {
 
-    var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products";
+    var query = "SELECT id, product_name, price, department_name FROM products";
 
     connection.query(query, function(err, res) {
 
-        for (var i = 0; i < res.length; i++) {
-            tableArray.push(res[i])
-        }
-
-        var rows = tableArray;
-        // console.log(rows)
-
-
+            console.log("Query is made: ")       
+            for (var i = 0; i < res.length; i++) {
+                rows.push(res[i])
+            }
 
         var header = [{
             value: "id",
@@ -300,8 +294,6 @@ function makeTable() {
             }())
         ];
 
-
-
         var t2 = Table(header, rows, {
             borderStyle: 1,
             paddingBottom: 0,
@@ -310,15 +302,9 @@ function makeTable() {
             color: "white"
         });
 
- 
-
-        var str2 = t2.render(rows);
+        var str2 = t2.render(header, rows);
         console.log(str2);
-
-        });
-
-
-
+});
     console.log("Attention shoppers! Select from these items by item id:");
 };
 
@@ -377,7 +363,7 @@ function smallTable(rows) {
         color: "white"
     });
 
-    var str2 = t2.render();
+    var str2 = t2.render(header, rows);
     console.log(str2);
 
 };
@@ -444,7 +430,7 @@ function smallDataTable(rows) {
         color: "white"
     });
 
-    var str2 = t2.render();
+    var str2 = t2.render(header, rows);
     console.log(str2);
 
 };
@@ -511,7 +497,7 @@ function fullDataTable(rows) {
         color: "white"
     });
 
-    var str2 = t2.render();
+    var str2 = t2.render(header,rows);
     console.log(str2);
 
 };
