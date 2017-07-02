@@ -137,9 +137,8 @@ function ifOrder(item, productName, price, department, quantity, amount) {
 
                 console.log("No? Perhaps you'd like to order something else.")
 
-                setTimeout(reset, 1000);
-                setTimeout(makeTable, 2000);
-                setTimeout(newOrder, 3000);
+                setTimeout(reset, 2000);
+              
 
             }
             if (answer.order_confirmation === true) {
@@ -186,8 +185,7 @@ function checkInventory(item, productName, price, department, quantity, amount) 
         console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
         setTimeout(smallDataTable, 1500,rows)
                 setTimeout(reset, 2000);
-                setTimeout(makeTable, 2500);
-                setTimeout(newOrder, 3000);
+                
 
     } else {
         rows = smallDataArray;
@@ -204,8 +202,7 @@ function calculateCost(item, productName, price, department, quantity, amount) {
 
     upDate(item, productName, price, department, quantity, newQuant, amount);
                 setTimeout(reset, 2000);
-                setTimeout(makeTable, 2500);
-                setTimeout(newOrder, 3000);
+              
 }
 
 function upDate(item, productName, price, department, quantity, newQuant, amount) {
@@ -234,6 +231,8 @@ function reset() {
     let newQuant = 0;
     var smallArray = [];
     var rows = [];
+    setTimeout(makeTable,2000, rows);
+    setTimeout(newOrder, 3000);
 
 }
 
