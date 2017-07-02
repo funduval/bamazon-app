@@ -5,11 +5,14 @@
 
 ## Hi and welcome to my README presentation of the bamazon-app. 
 
-#### I'd like to start by saying it is mostly working well except that once I turn off the MySql connection,
-#### app doesn't automatically re-connect! This is sad because I purposefully used Heroku's 'JAWSDB/Maria'
-#### launching method so I could preserve this connection somewhere and be able to show the app (in the future
-#### I intend to keep building on it) from anywhere. So, if you get thrown off, or if it's not creating the
-#### table from the get-go (I worry the table itself has a bug,) here's my connection info:
+#### I'd like to start by saying it is mostly working well except that once I turn off the MySQL connection,
+#### the app doesn't automatically re-connect. I purposefully used Heroku's 'JAWSDB/Maria' method so I could
+#### preserve this connection and be able to show the app to people from anywhere (in the future, since I
+#### intend to keep building on it.) But I am still learning how to deploy... 
+
+#### If you want to try this as a CLI program & get thrown off, or if it's not creating the
+#### table from the get-go (I think the table itself has a bug, it works after multiple re-connects,) 
+#### this is my connection info:
 
 ```
 var connection = mysql.createConnection({
@@ -19,6 +22,7 @@ user: "otctzaj5ktg8bdja",
 password: "om6qg4tak4uuuel7",
 database: "r8hnulrvy9z046ju"
 });
+
 ```
 
 
