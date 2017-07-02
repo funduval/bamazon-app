@@ -4,7 +4,6 @@ const Table = require('tty-table');
 const chalk = require('chalk');
 
 //make all the variables global to use in any function
-
 let data=[];
 let item=0;
 let productName="";
@@ -14,11 +13,7 @@ let newQuant=0;
 var tableArray=[];
 var smallArray=[];
 
-
-
-
 //creating connection to Jaws MariaDB
-
 var connection = mysql.createConnection({
     host: "olxl65dqfuqr6s4y.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
     port: 3306,
@@ -27,12 +22,13 @@ var connection = mysql.createConnection({
     database: "r8hnulrvy9z046ju"
 });
 
-//call the new order function. I should make a new instance constructor for each order
-makeTable();
+//call the new order function. Needs a new instance constructor for each new order.
 
 newOrder();
 
 function newOrder() {
+
+    makeTable();
 
     inquirer.prompt({
             name: "id",
@@ -114,21 +110,23 @@ function checkQuantity(item, productName, price, department, quantity, amount) {
 function ifOrder(item, productName, price, department, quantity, amount) {
 
     inquirer.prompt({
-            name: "order confirmation",
+            name: "order_confirmation",
             type: "confirm",
             message: "Would you like to order the " + productName + "?"
         })
         .then(function(answer) {
+console.log(answer.order_confirmation)
 
-            if('order confirmation' === false){
+            if( answer.order_confirmation === false ){
 
                console.log("No? Perhaps you'd like to order something else.")
+
                setTimeout(reset, 1000);
-               setTimeout(makeTable, 1800);
+             
                setTimeout(newOrder, 2000);
             
           }
-            else{
+            if( answer.order_confirmation === true){
 
                takeOrder(item, productName, price, department, quantity, amount);
 
@@ -144,13 +142,15 @@ function takeOrder(item, productName, price, department, quantity, amount) {
             message: "How much or how many would you like to order?"
         })
         .then(function(answer) {
+
             for (key in answer) {
 
                 amount = answer[key]
 
             }
-            console.log("You have ordered " + amount + " items");
-            checkInventory(item, productName, price, department, quantity, amount)
+
+            console.log("You have ordered " + amount + " " + productName + " Checking to see if we have that many in stock");
+            setTimeout(checkInventory,2000,item, productName, price, department, quantity, amount)
 
         });
 }
@@ -160,22 +160,24 @@ function takeOrder(item, productName, price, department, quantity, amount) {
         newQuant = quantity - amount
 
         if (newQuant < 5) {
-
+            rows=smallArray;
             console.log("Good timing! There are fewer than 5 orders left.")
+            setTimeout(smallDataTable,1500,rows)
             setTimeout(calculateCost,2800,item, productName, price, department, quantity, amount);
 
-
         } else if (newQuant === 0) {
-
+            rows=smallArray;
             console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
-            setTimeout(reset, 2800);
-            setTimeout(makeTable, 3800);
-            setTimeout(newOrder, 4000);
+            setTimeout(smallDataTable,1500) 
+            setTimeout(reset, 2800,rows);
+            setTimeout(newOrder, 6000);
 
         } else {
+          rows=smallArray;
           console.log("Alrighty, we've plenty of those!")
-         setTimeout(calculateCost,2800,item, productName, price, department, quantity, amount);
-          
+          setTimeout(smallDataTable,1500,rows) 
+          setTimeout(calculateCost,2800,item, productName, price, department, quantity, amount);
+                 
         }
       }
 
@@ -185,9 +187,7 @@ function takeOrder(item, productName, price, department, quantity, amount) {
 
         upDate(item, productName, price, department, quantity, newQuant, amount);
         setTimeout(reset, 2800);
-        setTimeout(makeTable, 3800);
-        setTimeout(newOrder, 4000);
-
+        setTimeout(newOrder, 7000);
     }
 
     function upDate(item, productName, price, department, quantity, newQuant, amount) {
@@ -202,13 +202,27 @@ function takeOrder(item, productName, price, department, quantity, amount) {
             connection.query(sql, { id: id }, function(err, result) {
                 if (err) throw err;
                 console.log(result.affectedRows + " record(s) updated");
-
             });   
     });
-       
   }
 
-  function makeTable(){
+   function reset() {
+
+let data=[];
+let item=0;
+let productName="";
+let quantity=0;
+let department="";
+let newQuant=0;
+var tableArray=[];
+var smallArray=[];
+var rows=[];
+
+ }
+
+// from tty-table documentation:
+
+function makeTable(){
 console.log("Attention shoppers! Select from these items by item id:")
 
 var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products";
@@ -253,14 +267,6 @@ var header = [
     align : "left",
     paddingLeft : 5,
     width : 40
-  },
-  {
-    value : "stock_quantity",
-    headerColor : "cyan",
-    color: "grey",
-    align : "left",
-    paddingLeft : 5,
-    width : 37
   }]
 
 var footer = [
@@ -291,8 +297,70 @@ console.log(str2);
  });
  };
 
-
 function smallTable(rows){
+
+var header = [
+  {
+    value : "id",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 8
+  },
+  {
+    value : "product_name",
+    headerColor : "yellow",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "price",
+    headerColor : "magenta",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 28
+  },
+  {
+    value : "department_name",
+    headerColor : "green",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  }]
+
+var footer = [
+  "TOTAL",
+  (function(){
+    return rows.reduce(function(prev,curr){
+      return prev+curr[1]
+    },0)
+  }()),
+  (function(){
+    var total = rows.reduce(function(prev,curr){
+      return prev+((curr[2]==='yes') ? 1 : 0);
+    },0);
+    return (total/rows.length*100).toFixed(2) + "%";
+  }())];
+
+var t2 = Table(header,rows,{
+  borderStyle : 1,
+  paddingBottom : 0,
+  headerAlign : "center",
+  align : "center",
+  color : "white"
+});
+
+var str2 = t2.render();
+console.log(str2);
+
+ };
+
+ function smallDataTable(rows){
 
 var header = [
   {
@@ -333,7 +401,7 @@ var header = [
     color: "grey",
     align : "left",
     paddingLeft : 5,
-    width : 37
+    width : 40
   }]
 
 var footer = [
@@ -363,18 +431,78 @@ console.log(str2);
 
  };
 
- function reset() {
+ function fullDataTable(rows){
 
-let data=[];
-let item=0;
-let productName="";
-let quantity=0;
-let department="";
-let newQuant=0;
-var tableArray=[];
-var smallArray=[];
+var header = [
+  {
+    value : "id",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 8
+  },
+  {
+    value : "product_name",
+    headerColor : "yellow",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "price",
+    headerColor : "magenta",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 28
+  },
+  {
+    value : "department_name",
+    headerColor : "green",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  },
+  {
+    value : "stock_quantity",
+    headerColor : "cyan",
+    color: "grey",
+    align : "left",
+    paddingLeft : 5,
+    width : 40
+  }]
 
- }
+var footer = [
+  "TOTAL",
+  (function(){
+    return rows.reduce(function(prev,curr){
+      return prev+curr[1]
+    },0)
+  }()),
+  (function(){
+    var total = rows.reduce(function(prev,curr){
+      return prev+((curr[2]==='yes') ? 1 : 0);
+    },0);
+    return (total/rows.length*100).toFixed(2) + "%";
+  }())];
+
+var t2 = Table(header,rows,{
+  borderStyle : 1,
+  paddingBottom : 0,
+  headerAlign : "center",
+  align : "center",
+  color : "white"
+});
+
+var str2 = t2.render();
+console.log(str2);
+
+ };
+
+
 
 
 
