@@ -1,46 +1,127 @@
 const inquirer = require('inquirer');
-const mysql = require('mysql');
+// const mysql = require('mysql');
 const Table = require('tty-table');
 const chalk = require('chalk');
 
 //make all the variables global to use in any function
-let data = [];
-let item = 0;
-let productName = "";
-let price = 0;
-let quantity = 0;
-let department = "";
-let newQuant = 0;
+var data = [];
+var item;
+var productName = "";
+var price = 0;
+var quantity = 0;
+var department = "";
+var newQuant = 0;
 var smallArray = [];
 var smallDataArray = [];
-var rows = [];
+var rows=[];
+
 
 //creating connection to Jaws MariaDB
-var connection = mysql.createConnection({
+var mysql = require('promise-mysql');
+
+var connection;
+
+mysql.createConnection({
     host: "olxl65dqfuqr6s4y.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
     port: 3306,
     user: "otctzaj5ktg8bdja",
     password: "om6qg4tak4uuuel7",
     database: "r8hnulrvy9z046ju"
-});
 
-// //call the new order function. Needs a new instance constructor for each new order.
+}).then(function(conn){
 
-start();
+   connection = conn;
+    return connection.query( "SELECT id, product_name, price, department_name FROM products");
+    
 
-function start(){
 
-connection.connect(function(err) {
+}).then(function(products){
+    
+   return buildRows(products)
+ 
+}).then(function(rows){
+    
+   return makeTable(rows)
+ 
+})
 
-    if (err) throw err;
-  console.log("Connected!")
+function buildRows(products){
 
-});  
-} 
+   for (var i = 0; i < products.length; i++) {
+       rows.push(products[i]);
+   }
+  console.log(rows);
 
-setTimeout(makeTable, 2000, rows)
+  return rows;
 
-setTimeout(newOrder, 3000);
+}
+
+function makeTable(rows) {
+
+var  rows = rows;
+
+console.log(rows);
+    
+        var header = [{
+            value: "id",
+            headerColor: "cyan",
+            color: "grey",
+            align: "left",
+            paddingLeft: 5,
+            width: 8
+        }, {
+            value: "product_name",
+            headerColor: "yellow",
+            color: "grey",
+            align: "left",
+            paddingLeft: 5,
+            width: 40
+        }, {
+            value: "price",
+            headerColor: "magenta",
+            color: "grey",
+            align: "left",
+            paddingLeft: 5,
+            width: 28
+        }, {
+            value: "department_name",
+            headerColor: "green",
+            color: "grey",
+            align: "left",
+            paddingLeft: 5,
+            width: 40
+        }]
+
+        var footer = [
+            "TOTAL",
+            (function() {
+                return rows.reduce(function(prev, curr) {
+                    return prev + curr[1]
+                }, 0)
+            }()),
+            (function() {
+                var total = rows.reduce(function(prev, curr) {
+                    return prev + ((curr[2] === 'yes') ? 1 : 0);
+                }, 0);
+                return (total / rows.length * 100).toFixed(2) + "%";
+            }())
+        ];
+
+        var t2 = Table(header, rows, {
+            borderStyle: 1,
+            paddingBottom: 0,
+            headerAlign: "center",
+            align: "center",
+            color: "white"
+        });
+
+        var str2 = t2.render(header, rows);
+        console.log(str2);
+    console.log("Attention shoppers! Select from these items by item id:");
+    newOrder();
+};
+
+
 
 function newOrder() {
 
@@ -237,136 +318,6 @@ function reset() {
 }
 
 // // from tty-table documentation:
-function makeTable(rows) {
-    var rows = rows
-    var query = "SELECT id, product_name, price, department_name FROM products";
-
-    connection.query(query, function(err, res) {
-
-            console.log("Query is made: ")       
-            for (var i = 0; i < res.length; i++) {
-                rows.push(res[i])
-            }
-          
-
-        var header = [{
-            value: "id",
-            headerColor: "cyan",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 8
-        }, {
-            value: "product_name",
-            headerColor: "yellow",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 40
-        }, {
-            value: "price",
-            headerColor: "magenta",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 28
-        }, {
-            value: "department_name",
-            headerColor: "green",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 40
-        }]
-
-        var footer = [
-            "TOTAL",
-            (function() {
-                return rows.reduce(function(prev, curr) {
-                    return prev + curr[1]
-                }, 0)
-            }()),
-            (function() {
-                var total = rows.reduce(function(prev, curr) {
-                    return prev + ((curr[2] === 'yes') ? 1 : 0);
-                }, 0);
-                return (total / rows.length * 100).toFixed(2) + "%";
-            }())
-        ];
-
-        var t2 = Table(header, rows, {
-            borderStyle: 1,
-            paddingBottom: 0,
-            headerAlign: "center",
-            align: "center",
-            color: "white"
-        });
-
-        var str2 = t2.render(header, rows);
-        console.log(str2);
-});
-    console.log("Attention shoppers! Select from these items by item id:");
-};
-
-function smallTable(rows) {
-
-    var header = [{
-        value: "id",
-        headerColor: "cyan",
-        color: "grey",
-        align: "left",
-        paddingLeft: 5,
-        width: 8
-    }, {
-        value: "product_name",
-        headerColor: "yellow",
-        color: "grey",
-        align: "left",
-        paddingLeft: 5,
-        width: 40
-    }, {
-        value: "price",
-        headerColor: "magenta",
-        color: "grey",
-        align: "left",
-        paddingLeft: 5,
-        width: 28
-    }, {
-        value: "department_name",
-        headerColor: "green",
-        color: "grey",
-        align: "left",
-        paddingLeft: 5,
-        width: 40
-    }]
-
-    var footer = [
-        "TOTAL",
-        (function() {
-            return rows.reduce(function(prev, curr) {
-                return prev + curr[1]
-            }, 0)
-        }()),
-        (function() {
-            var total = rows.reduce(function(prev, curr) {
-                return prev + ((curr[2] === 'yes') ? 1 : 0);
-            }, 0);
-            return (total / rows.length * 100).toFixed(2) + "%";
-        }())
-    ];
-
-    var t2 = Table(header, rows, {
-        borderStyle: 1,
-        paddingBottom: 0,
-        headerAlign: "center",
-        align: "center",
-        color: "white"
-    });
-
-    var str2 = t2.render(header, rows);
-    console.log(str2);
-
-};
 
 function smallDataTable(rows) {
 
@@ -501,3 +452,4 @@ function fullDataTable(rows) {
     console.log(str2);
 
 };
+
