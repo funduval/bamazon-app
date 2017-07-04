@@ -15,6 +15,7 @@ var smallArray = [];
 var smallDataArray = [];
 var rows = [];
 
+
 //creating connection to Jaws MariaDB
 var connection = mysql.createConnection({
     host: "olxl65dqfuqr6s4y.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
@@ -24,52 +25,58 @@ var connection = mysql.createConnection({
     database: "r8hnulrvy9z046ju"
 });
 
-// //call the new order function. Needs a new instance constructor for each new order.
+//===========================Call the functions that start the program===========//
 
 start();
 
-function start(){
+makeTable();
 
-connection.connect(function(err) {
+setTimeout(newOrder, 2000);
 
-    if (err) throw err;
-  console.log("Connected!")
+//=======================================|==*****************==|=========//
+//=======================================|==Function Junction==|=========//
+//=======================================|==*****************==|=========//
 
-});  
-} 
+function start() {
 
-setTimeout(makeTable, 2000, rows)
+    connection.connect(function(err) {
 
-setTimeout(newOrder, 3000);
+        if (err) throw err;
+        console.log("Connected!")
+
+    });
+}
+
+//==================newOrder asks which item number, after table loads===========//
 
 function newOrder() {
 
     inquirer.prompt({
-            name: "id",
-            type: "input",
-            message: "What item number would you like to search for?"
-        })
-        .then(function(answer) {
+        name: "id",
+        type: "input",
+        message: "What item number would you like to search for?"
 
-            //parses answer to just grab the value of id
-            for (key in answer) {
+    }).then(function(answer) {
 
-                item = answer[key]
+        //parses answer to just grab the value of id
+        for (key in answer) {
 
-            }
+            item = answer[key]
 
-            console.log(item)
+        }
 
-            searchItem(item);
+        searchItem(item);
 
-        });
+    });
 }
+
+//searchItem makes a query with the item number, stores all variables after result//
+
 
 function searchItem(item) {
 
     var query = "SELECT id, product_name, price, department_name, stock_quantity FROM products WHERE ?";
 
- console.log(price)
     connection.query(query, { id: item }, function(err, res) {
 
         for (key in res) {
@@ -77,13 +84,13 @@ function searchItem(item) {
             data = res[key];
             smallArray.push(data);
             smallDataArray.push(data);
-       
 
         }
 
-        console.log("\nYou searched for: " + data.product_name + "\nPrice: " + data.price);
+        console.log("\nYou searched for: " + "\n" + data.product_name + "\n\nPrice: " + data.price);
 
         //parse all the values to store in global variables
+
         item = data.id;
         productName = data.product_name;
         price = data.price;
@@ -96,12 +103,14 @@ function searchItem(item) {
     });
 }
 
+//nextQuestion asks the amount and calls checkQuantity function//
+
 function nextQuestion(item, productName, price, department, quantity) {
 
     inquirer.prompt({
             name: "amount",
             type: "input",
-            message: "how many of " + productName + " would you like to order?"
+            message: "How many of " + productName + " would you like to order?"
         })
         .then(function(answer) {
 
@@ -117,12 +126,16 @@ function nextQuestion(item, productName, price, department, quantity) {
         });
 }
 
+//nextQuestion asks the amount and calls checkQuantity function//
+
 function checkQuantity(item, productName, price, department, quantity, amount) {
 
-    console.log("We have " + quantity + " left of " + productName);
+    console.log("\nWe have " + quantity + " left of " + productName);
 
     ifOrder(item, productName, price, department, quantity, amount);
 }
+
+//==ifOrder confirms that customer wants an order, if not, resets to beginning==//
 
 function ifOrder(item, productName, price, department, quantity, amount) {
 
@@ -138,16 +151,18 @@ function ifOrder(item, productName, price, department, quantity, amount) {
                 console.log("No? Perhaps you'd like to order something else.")
 
                 setTimeout(reset, 2000);
-              
 
             }
+
             if (answer.order_confirmation === true) {
 
                 takeOrder(item, productName, price, department, quantity, amount);
 
             }
         });
-}
+};
+
+//==ifOrder re-confirms the quantity of order, calls checkInventory function==//
 
 function takeOrder(item, productName, price, department, quantity, amount) {
 
@@ -164,11 +179,14 @@ function takeOrder(item, productName, price, department, quantity, amount) {
 
             }
 
-            console.log("You have ordered " + amount + " " + productName + " Checking to see if we have that many in stock");
+            console.log("\nYou have ordered " + amount + " " + productName + ". \nChecking to see if we have that many in stock.");
             setTimeout(checkInventory, 2000, item, productName, price, department, quantity, amount)
 
         });
 }
+
+//checkInventory checks the stock_quantity, using stored variable from 1st query//
+//new table view for the item is generated, using stored variable from 1st query//
 
 function checkInventory(item, productName, price, department, quantity, amount) {
 
@@ -176,37 +194,41 @@ function checkInventory(item, productName, price, department, quantity, amount) 
 
     if (newQuant < 5) {
         rows = smallDataArray;
-        console.log("Good timing! There are fewer than 5 orders left.")
+        console.log("\nGood timing! There are fewer than 5 orders left.")
         setTimeout(smallDataTable, 1500, rows)
         setTimeout(calculateCost, 2800, item, productName, price, department, quantity, amount);
 
     } else if (newQuant === 0) {
         rows = smallDataArray;
-        console.log("Oh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
-        setTimeout(smallDataTable, 1500,rows)
-                setTimeout(reset, 2000);
-                
+        console.log("\nOh no! We seem to be out of that inventory. Try again in a week or two. You will now be taken to a new order page.")
+        setTimeout(smallDataTable, 1500, rows)
+        setTimeout(reset, 2000);
 
     } else {
         rows = smallDataArray;
-        console.log("Alrighty, we've plenty of those!")
+        console.log("\nAlrighty, we've plenty of those!")
         setTimeout(smallDataTable, 1500, rows)
         setTimeout(calculateCost, 2800, item, productName, price, department, quantity, amount);
 
     }
 }
 
+//================calculate (cost * quantity) and call upDate function========//
+
 function calculateCost(item, productName, price, department, quantity, amount) {
 
-    console.log("Your order comes to $" + price * amount);
+    console.log("\nYour order comes to $" + price * amount + ".");
 
     upDate(item, productName, price, department, quantity, newQuant, amount);
-                setTimeout(reset, 2000);
-              
+    setTimeout(reset, 2000);
+
 }
 
+//========================upDate mySQL database (must refresh Db)===============// 
+//====================IMPORTANT: convert integer in query to string=============//
+
 function upDate(item, productName, price, department, quantity, newQuant, amount) {
-    console.log("updating databases")
+    console.log("\nUpdating inventory...")
     connection.connect(function(err) {
 
         var lessQuant = quantity - amount
@@ -216,10 +238,12 @@ function upDate(item, productName, price, department, quantity, newQuant, amount
 
         connection.query(sql, { id: id }, function(err, result) {
             if (err) throw err;
-            console.log(result.affectedRows + " record(s) updated");
+            console.log("\nRecord(s) updated.");
         });
     });
-}
+};
+
+//============================================resets variables==================//
 
 function reset() {
 
@@ -230,88 +254,74 @@ function reset() {
     let department = "";
     let newQuant = 0;
     var smallArray = [];
-    var rows = [];
-    setTimeout(makeTable,2000, rows);
-    setTimeout(newOrder, 3000);
+    makeTable();
+    setTimeout(newOrder, 6000);
+};
 
-}
+//Table is from tty-table npm. Tricky, doesn't always load after sign-out//
 
-// // from tty-table documentation:
-function makeTable(rows) {
+function makeTable() {
 
-    rows = rows;
+    var header = [{
+        value: "id",
+        headerColor: "cyan",
+        color: "grey",
+        align: "left",
+        paddingLeft: 5,
+        width: 8
+    }, {
+        value: "product_name",
+        headerColor: "yellow",
+        color: "grey",
+        align: "left",
+        paddingLeft: 5,
+        width: 40
+    }, {
+        value: "price",
+        headerColor: "magenta",
+        color: "grey",
+        align: "left",
+        paddingLeft: 5,
+        width: 28
+    }, {
+        value: "department_name",
+        headerColor: "green",
+        color: "grey",
+        align: "left",
+        paddingLeft: 5,
+        width: 40
+    }]
 
     var query = "SELECT id, product_name, price, department_name FROM products";
 
     connection.query(query, function(err, res) {
 
-            console.log("Query is made: ")       
             for (var i = 0; i < res.length; i++) {
-                rows.push(res[i])
+     
+            rows.push(res[i]);  
+
             }
-          
 
-        var header = [{
-            value: "id",
-            headerColor: "cyan",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 8
-        }, {
-            value: "product_name",
-            headerColor: "yellow",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 40
-        }, {
-            value: "price",
-            headerColor: "magenta",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 28
-        }, {
-            value: "department_name",
-            headerColor: "green",
-            color: "grey",
-            align: "left",
-            paddingLeft: 5,
-            width: 40
-        }]
+            var t2 = Table(header, rows, {
+                borderStyle: 1,
+                paddingBottom: 0,
+                headerAlign: "center",
+                align: "center",
+                color: "white"
+            });
 
-        var footer = [
-            "TOTAL",
-            (function() {
-                return rows.reduce(function(prev, curr) {
-                    return prev + curr[1]
-                }, 0)
-            }()),
-            (function() {
-                var total = rows.reduce(function(prev, curr) {
-                    return prev + ((curr[2] === 'yes') ? 1 : 0);
-                }, 0);
-                return (total / rows.length * 100).toFixed(2) + "%";
-            }())
-        ];
+            var str2 = t2.render();
+            console.log(str2);  
+ });
 
-        var t2 = Table(header, rows, {
-            borderStyle: 1,
-            paddingBottom: 0,
-            headerAlign: "center",
-            align: "center",
-            color: "white"
-        });
+    console.log("\nAttention shoppers! Select from these items by item id:");
+  
+}
 
-        var str2 = t2.render(header, rows);
-        console.log(str2);
-});
-    console.log("Attention shoppers! Select from these items by item id:");
-};
+//small table view for the item-only is generated, using variable from 1st query//
 
 function smallTable(rows) {
-
+    rows = rows;
     var header = [{
         value: "id",
         headerColor: "cyan",
@@ -369,6 +379,8 @@ function smallTable(rows) {
     console.log(str2);
 
 };
+
+//small data table is generated (manager's view someday.) Includes stock_quantity//
 
 function smallDataTable(rows) {
 
@@ -437,8 +449,10 @@ function smallDataTable(rows) {
 
 };
 
-function fullDataTable(rows) {
+//full data table (managers & supervisors.) Includes stock_quantity of ALL ITEMS//
 
+function fullDataTable(rows) {
+        rows = rows;
     var header = [{
         value: "id",
         headerColor: "cyan",
@@ -501,5 +515,4 @@ function fullDataTable(rows) {
 
     var str2 = t2.render(header,rows);
     console.log(str2);
-
 };
