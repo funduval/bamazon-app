@@ -238,7 +238,9 @@ function reset() {
 
 // // from tty-table documentation:
 function makeTable(rows) {
-    var rows = rows
+
+    rows = rows;
+
     var query = "SELECT id, product_name, price, department_name FROM products";
 
     connection.query(query, function(err, res) {
