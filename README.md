@@ -23,4 +23,6 @@ Here are some links to the Google Slideshow that presents screenshots of the wor
 
 [Google Slideshow](https://docs.google.com/presentation/d/1Bm8BdWKBz_qvfBlBGRQ9gf1VYcVP1L__7sormKXwzes/edit?usp=sharing)
 
-[Watch Video] (https://drive.google.com/file/d/0B62xIHGJ328ZVnVxaVhuQnhHdDg/view?usp=sharing)
+[Watch Video for mobile](https://drive.google.com/file/d/0B62xIHGJ328ZVnVxaVhuQnhHdDg/view?usp=sharing)
+
+[Watch Video in HD](https://drive.google.com/file/d/0B62xIHGJ328ZN1ROUEc4VlJmeXM/view?usp=sharing) 
