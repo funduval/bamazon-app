@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <!--metatag for Log-In-->
+  <meta name="google-signin-scope" content="profile email">
+  <meta name="google-signin-client_id" content="580134311712-mefi6sqvababpcio3ef88e3a0kpuv3qs.apps.googleusercontent.com">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Reset CSS -->
+<!--   <link rel="stylesheet" type="text/css" href="assets/reset.css">
+ -->  <!-- Materialize Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" type="text/css" href="./style.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway:300i,400" rel="stylesheet">
+  <!-- Makes Button Icon Work -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Firebase-->
+  <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
+  <!--Most stable and latest version of jQuery-->
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <!-- Materialize Compiled and minified JavaScript -->
+  <script src="assets/materialize.min.js"></script>
+  <!--Log-in Library, Google-->
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <!--Google Maps: API call is done in this format-->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVq_5rVixXpbEVR3iPtHR5sm6s4ikNxXY&callback=initMap"></script>
+  <!-- External JS -->
+  <script src="assets/kraftbeard.js" type="text/javascript"></script>
+
+  <title>Bamazon</title>
+</head>
+
+<body>
+
+  <!-- map and results -->
+  <div id="wrapper">
+
+    <div class="row">
+      <div class="col s12">
+
+        <!-- Modal Structure -->
+        <div id="modal226" class="modal">
+          <div class="modal-content">
+            <h4 class="itemShop">Modal Header</h4>
+            <p class="nameShop">A bunch of text</p>
+            <p class="cityShop">A bunch of text</p>
+            <p class="departmentShop">A bunch of text</p>
+            <p class="priceShop">A bunch of text</p>
+          </div>
+        </div>
+
+        </div>
+      
+
+      </div>
+    </div>
+
+    <!-- TITLE -->
+    <div class="row">
+      <div class="col s6">
+        <h1 id="title">Bam</h1>
+      </div>
+      <div class="col s1">
+        <h1 id="title3">!</h1>
+      </div>
+      <div class="col s4 hide-on-med-and-down">
+        <h1 id="title2">azon</h1>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col m5">
+        <div class="card white darken-1 z-depth-0">
+          <div class="card-content black-text" id="sub">
+            <!--Google Maps API div-->
+            <span class="card-title">A Shopper's Paradise</span>
+            <p>Shop Departments</p>
+          </div>
+        </div>
+      </div>
+
+   
+
+      <div class="col s6" id="resulting">
+        <div class="card white darken-1 z-depth-0">
+          <div class="card-content black-text">
+            <span class="card-title">RESULTS</span>
+            <div id="itemId"></div>
+            <div id="productName"></div>
+            <div id="price"></div>
+            <div id="department"></div>
+            <div id="stock"></div>
+          </div>
+        </div>
+      </div>
+     
+    </div>
+</div>
+</body>
+
+</html>

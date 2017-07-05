@@ -1,0 +1,167 @@
+body {
+	background-image: url(../assets/images/background-half.png);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-color: #F29E04;
+}
+
+/*HEADER*/
+#title {
+	font-family: "Oswald", sans-serif;
+	font-size: 200px;
+	color: #F25B04;
+	letter-spacing: 10px;
+	margin-left: 18%;
+	margin-top: 0;
+	background-color: #F2F2F2;
+	padding-left: 10%;
+	
+;
+}
+
+#title2 {
+	font-family: "Oswald", sans-serif;
+	font-size: 200px;
+	color: #F25B04;
+	letter-spacing: 10px;
+	margin-top: 0;
+	margin-left: 0px;
+	background-color: #F2F2F2;
+	
+}
+#title3 {
+	font-family: "Oswald", sans-serif;
+	font-size: 220px;
+	color: #3D3F01;
+	letter-spacing: 0px;
+	margin-left: -28%;
+	background-color: #F2F2F2;
+	font-style: bold;
+	height: 220px;
+	line-height: 220px;
+	margin-top: 0;
+	padding-bottom: 12px;
+	padding-top: 0px;
+	
+}
+
+.row .col {
+	padding: 0;
+}
+
+/*CENTER CONTENT*/
+#wrapper {
+	margin-left: 5%;
+	margin-right: 6%;
+}
+
+/*CARD*/
+.card {
+	margin-left: 22%;
+	background-color: #F2F2F2;
+	color: #3D3F01;
+
+
+}
+.card-content{
+
+	background-color: #F2F2F2;
+	color: #3D3F01;
+
+}
+
+.card .card-content .card-title {
+	
+  	font-family: "Oswald", sans-serif;
+	text-align: center;
+	letter-spacing: 2px;
+	color: #3D3F01;
+	font-size: 30px;
+	margin-bottom: 15px;
+	background-color: #F2F2F2;
+}
+
+#sub{
+
+	color: #3D3F01;
+}
+.card{
+color: #3D3F01;
+
+}
+
+.card-title{
+		color: #3D3F01;
+
+}
+
+
+
+/*MODAL*/
+#modal1 {
+	display: block;
+	margin-bottom: .85em;
+	margin-left: 10px;
+}
+
+.modal .modal-content {
+	background-color: #F2F2F2;
+	text-align: center;
+	color: #3D3F01;
+}
+
+/*BUTTONS*/
+.btn {
+	background-color: #999;
+}
+
+.btn:hover {
+	background-color:#333;
+}
+
+.btn:active {
+	background-color: #999;
+}
+
+.btn:visited {
+	background-color: #999;
+}
+
+.btn:focus {
+	background-color: #333;
+}
+/*MODAL TEXT*/
+#nameBrew {
+	font-family: "Oswald", sans-serif;
+	font-size: 50px;
+	margin-bottom: 30px;
+	color: #3D3F01;
+}
+
+
+p {
+	font-family: "Raleway", sans-serif;
+	font-style: italic;
+	font-size: 20px;
+	margin-bottom: 20px;
+	color: #3D3F01;
+	background-color: #F2F2F2;
+
+}
+
+@media screen and (max-width: 1000px) {
+    #title {
+    	background-color: transparent;
+    	margin-left: 8%;
+    	
+    }
+    #title3 {
+    	background-color: transparent;
+    	opacity: .3;
+    	margin-left: -70%;
+
+    }
+    #resulting{
+    	margin-left: 20%
+    }
+}
