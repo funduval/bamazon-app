@@ -19,8 +19,8 @@ database: "r8hnulrvy9z046ju"
 });
 
 ```
-Here is a link to the Google Slideshow that presents screenshots of the working CLI app:
+Here are some links to the Google Slideshow that presents screenshots of the working CLI app, as well as a video of the working app. See the slides for the MySQL images:
 
 [Google Slideshow](https://docs.google.com/presentation/d/1Bm8BdWKBz_qvfBlBGRQ9gf1VYcVP1L__7sormKXwzes/edit?usp=sharing)
 
-**Video coming soon...**
+[Watch Video] (https://drive.google.com/file/d/0B62xIHGJ328ZVnVxaVhuQnhHdDg/view?usp=sharing)
